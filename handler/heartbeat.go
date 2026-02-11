@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/mohsen/alertingGo/db"
-	"github.com/mohsen/alertingGo/model"
+	"github.com/mohsen/alertinGo/db"
+	"github.com/mohsen/alertinGo/model"
 )
 
 type HeartbeatRequest struct {

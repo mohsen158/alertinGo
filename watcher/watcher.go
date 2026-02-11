@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/mohsen/alertingGo/db"
-	"github.com/mohsen/alertingGo/notifier"
+	"github.com/mohsen/alertinGo/db"
+	"github.com/mohsen/alertinGo/notifier"
 )
 
 func Start() {

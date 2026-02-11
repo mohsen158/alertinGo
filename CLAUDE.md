@@ -1,4 +1,4 @@
-# AlertingGo Project
+# AlertinGo Project
 
 ## Overview
 Health check monitoring & alerting system in Go. Servers send heartbeats; if they stop, Telegram alerts fire.

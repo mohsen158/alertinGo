@@ -1,4 +1,4 @@
-# AlertingGo
+# AlertinGo
 
 Health check monitoring and alerting system built with Go. Monitored servers send heartbeats, and if they stop arriving within a configured timeout, alerts are sent via Telegram.
 
@@ -83,7 +83,7 @@ postgres://alerting:alerting@localhost:5432/alerting
 ## Project Structure
 
 ```
-alertingGo/
+alertinGo/
 ├── cmd/main.go              # Entry point
 ├── handler/
 │   ├── heartbeat.go         # POST /heartbeat

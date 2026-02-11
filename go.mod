@@ -1,4 +1,4 @@
-module github.com/mohsen/alertingGo
+module github.com/mohsen/alertinGo
 
 go 1.25
 

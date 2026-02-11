@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/mohsen/alertingGo/model"
+	"github.com/mohsen/alertinGo/model"
 )
 
 var Pool *pgxpool.Pool

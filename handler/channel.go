@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/mohsen/alertingGo/db"
+	"github.com/mohsen/alertinGo/db"
 )
 
 type CreateChannelRequest struct {

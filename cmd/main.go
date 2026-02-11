@@ -6,9 +6,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"github.com/mohsen/alertingGo/db"
-	"github.com/mohsen/alertingGo/handler"
-	"github.com/mohsen/alertingGo/watcher"
+	"github.com/mohsen/alertinGo/db"
+	"github.com/mohsen/alertinGo/handler"
+	"github.com/mohsen/alertinGo/watcher"
 )
 
 func main() {

@@ -36,6 +36,14 @@ type AlertState struct {
 	ResolvedAt    *time.Time `json:"resolved_at,omitempty"`
 }
 
+type ApiKey struct {
+	ID        string    `json:"id"`
+	Name      string    `json:"name"`
+	KeyPrefix string    `json:"key_prefix"`
+	IsActive  bool      `json:"is_active"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
 type NotificationLog struct {
 	ID        string    `json:"id"`
 	MonitorID string    `json:"monitor_id"`

@@ -25,7 +25,10 @@ docker compose up --build
 | Method | Path | Description |
 |--------|------|-------------|
 | GET | `/api/v1/health` | Health check |
-| POST | `/api/v1/heartbeat` | Receive heartbeat (auto-creates monitor) |
+| POST | `/api/v1/heartbeat` | Receive heartbeat (requires `X-API-Key` header) |
+| GET | `/api/v1/api-keys` | List API keys |
+| POST | `/api/v1/api-keys` | Create API key (returns plaintext once) |
+| DELETE | `/api/v1/api-keys/:id` | Delete API key |
 | GET | `/api/v1/monitors` | List all monitors |
 | GET | `/api/v1/monitors/:id` | Get one monitor |
 | PUT | `/api/v1/monitors/:id` | Activate + assign channel |
@@ -37,11 +40,22 @@ docker compose up --build
 
 ## Usage Example
 
-**1. Send a heartbeat:**
+**1. Create an API key:**
+
+```bash
+curl -X POST http://localhost:8080/api/v1/api-keys \
+  -H 'Content-Type: application/json' \
+  -d '{"name": "web-server-1"}'
+```
+
+Save the `key` from the response — it won't be shown again.
+
+**2. Send a heartbeat:**
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/heartbeat \
   -H 'Content-Type: application/json' \
+  -H 'X-API-Key: <your-api-key>' \
   -d '{
     "monitor_name": "payment-service",
     "check_type": "cpu",
@@ -52,7 +66,7 @@ curl -X POST http://localhost:8080/api/v1/heartbeat \
   }'
 ```
 
-**2. Create a notification channel:**
+**3. Create a notification channel:**
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/channels \
@@ -60,7 +74,7 @@ curl -X POST http://localhost:8080/api/v1/channels \
   -d '{"name": "CPU Alerts", "telegram_chat_id": "-100123456"}'
 ```
 
-**3. Activate the monitor and assign a channel:**
+**4. Activate the monitor and assign a channel:**
 
 ```bash
 curl -X PUT http://localhost:8080/api/v1/monitors/<monitor-id> \
@@ -68,9 +82,9 @@ curl -X PUT http://localhost:8080/api/v1/monitors/<monitor-id> \
   -d '{"is_active": true, "channel_id": "<channel-id>"}'
 ```
 
-**4. Stop sending heartbeats** → Telegram alert fires after timeout.
+**5. Stop sending heartbeats** → Telegram alert fires after timeout.
 
-**5. Resume heartbeats** → Recovery notification is sent.
+**6. Resume heartbeats** → Recovery notification is sent.
 
 ## Database Access
 
@@ -89,12 +103,16 @@ alertinGo/
 │   ├── heartbeat.go         # POST /heartbeat
 │   ├── monitor.go           # Monitor CRUD
 │   ├── channel.go           # Channel CRUD
+│   ├── api_key.go           # API key management
 │   └── notification_log.go  # Notification logs
+├── middleware/auth.go       # API key auth middleware
 ├── model/models.go          # Data models
 ├── db/db.go                 # DB connection + queries
 ├── watcher/watcher.go       # Background timeout checker
 ├── notifier/telegram.go     # Telegram notifications
-├── migrations/001_initial.sql
+├── migrations/
+│   ├── 001_initial.sql
+│   └── 002_api_keys.sql
 ├── docker-compose.yml
 ├── Dockerfile
 ├── .env.example

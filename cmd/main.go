@@ -8,6 +8,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/mohsen/alertinGo/db"
 	"github.com/mohsen/alertinGo/handler"
+	"github.com/mohsen/alertinGo/middleware"
 	"github.com/mohsen/alertinGo/watcher"
 )
 
@@ -27,7 +28,11 @@ func main() {
 			c.JSON(200, gin.H{"status": "ok"})
 		})
 
-		api.POST("/heartbeat", handler.PostHeartbeat)
+		api.POST("/heartbeat", middleware.RequireAPIKey(), handler.PostHeartbeat)
+
+		api.GET("/api-keys", handler.ListApiKeys)
+		api.POST("/api-keys", handler.CreateApiKey)
+		api.DELETE("/api-keys/:id", handler.DeleteApiKey)
 
 		api.GET("/monitors", handler.GetMonitors)
 		api.GET("/monitors/:id", handler.GetMonitor)

@@ -33,15 +33,22 @@ func Connect() {
 }
 
 func RunMigrations() {
-	sql, err := os.ReadFile("migrations/001_initial.sql")
-	if err != nil {
-		log.Fatalf("failed to read migration file: %v", err)
+	migrations := []string{
+		"migrations/001_initial.sql",
+		"migrations/002_api_keys.sql",
 	}
 
-	if _, err := Pool.Exec(context.Background(), string(sql)); err != nil {
-		log.Printf("migration warning (may already be applied): %v", err)
-	} else {
-		log.Println("migrations applied")
+	for _, file := range migrations {
+		sql, err := os.ReadFile(file)
+		if err != nil {
+			log.Fatalf("failed to read migration file %s: %v", file, err)
+		}
+
+		if _, err := Pool.Exec(context.Background(), string(sql)); err != nil {
+			log.Printf("migration warning (%s, may already be applied): %v", file, err)
+		} else {
+			log.Printf("migration applied: %s", file)
+		}
 	}
 }
 
@@ -306,6 +313,45 @@ func GetNotificationLogs(ctx context.Context) ([]model.NotificationLog, error) {
 		logs = append(logs, l)
 	}
 	return logs, nil
+}
+
+// --- API Keys ---
+
+func CreateApiKey(ctx context.Context, name, keyHash, keyPrefix string) (*model.ApiKey, error) {
+	query := `INSERT INTO api_keys (name, key_hash, key_prefix) VALUES ($1, $2, $3) RETURNING id, name, key_prefix, is_active, created_at`
+
+	var k model.ApiKey
+	err := Pool.QueryRow(ctx, query, name, keyHash, keyPrefix).Scan(&k.ID, &k.Name, &k.KeyPrefix, &k.IsActive, &k.CreatedAt)
+	return &k, err
+}
+
+func GetAllApiKeys(ctx context.Context) ([]model.ApiKey, error) {
+	rows, err := Pool.Query(ctx, `SELECT id, name, key_prefix, is_active, created_at FROM api_keys ORDER BY created_at DESC`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var keys []model.ApiKey
+	for rows.Next() {
+		var k model.ApiKey
+		if err := rows.Scan(&k.ID, &k.Name, &k.KeyPrefix, &k.IsActive, &k.CreatedAt); err != nil {
+			return nil, err
+		}
+		keys = append(keys, k)
+	}
+	return keys, nil
+}
+
+func DeleteApiKey(ctx context.Context, id string) error {
+	_, err := Pool.Exec(ctx, `DELETE FROM api_keys WHERE id = $1`, id)
+	return err
+}
+
+func ValidateApiKey(ctx context.Context, keyHash string) (bool, error) {
+	var exists bool
+	err := Pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM api_keys WHERE key_hash = $1 AND is_active = true)`, keyHash).Scan(&exists)
+	return exists, err
 }
 
 // --- Helpers ---

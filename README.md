@@ -97,7 +97,8 @@ postgres://alerting:alerting@localhost:5432/alerting
 alertinGo/
 ├── cmd/
 │   ├── main.go              # Entry point
-│   └── admin/main.go        # Admin CLI (generate API key)
+│   ├── admin/main.go        # Admin CLI (generate API key)
+│   └── webhook/main.go      # Deploy poller (polls GitHub for new commits)
 ├── handler/
 │   ├── heartbeat.go         # POST /heartbeat
 │   ├── monitor.go           # Monitor CRUD
@@ -112,6 +113,8 @@ alertinGo/
 ├── migrations/
 │   ├── 001_initial.sql
 │   └── 002_api_keys.sql
+├── scripts/
+│   └── deploy.sh            # Auto-deploy script
 ├── docker-compose.yml
 ├── Dockerfile
 ├── .env.example
@@ -125,3 +128,20 @@ alertinGo/
 | `DATABASE_URL` | Postgres connection string | — |
 | `TELEGRAM_BOT_TOKEN` | Telegram Bot API token | — |
 | `PORT` | HTTP server port | `8080` |
+| `DEPLOY_DIR` | Project directory on server (for deploy poller) | Working directory |
+| `DEPLOY_BRANCH` | Git branch to track | `main` |
+| `POLL_INTERVAL` | Seconds between checks for new commits | `30` |
+
+## Auto-Deploy (Git Polling)
+
+The deploy poller runs **outside** Docker Compose (so it can restart the stack without killing itself). It polls GitHub every 30s for new commits — no inbound network access required (works behind NAT).
+
+```bash
+# Build the deploy poller
+go build -o deploy-poller ./cmd/webhook/
+
+# Run it (or configure as a systemd service)
+DEPLOY_DIR=/path/to/alertinGo ./deploy-poller
+```
+
+On each cycle it runs `git fetch`, compares local HEAD with `origin/<branch>`, and if there are new commits, runs `scripts/deploy.sh` (git pull + docker compose rebuild).

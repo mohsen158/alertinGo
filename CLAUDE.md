@@ -17,6 +17,8 @@ Flat structure, no internal/repository/service split. Handlers talk to `db` pack
 ```
 cmd/main.go           → entry point, routes
 cmd/admin/main.go     → admin CLI (generate API key)
+cmd/webhook/main.go   → deploy poller, polls GitHub for new commits (runs outside Docker)
+scripts/deploy.sh     → deploy script (git pull + docker compose rebuild)
 handler/heartbeat.go  → POST /heartbeat (upsert monitor)
 handler/monitor.go    → GET/PUT/DELETE monitors
 handler/channel.go           → GET/POST/DELETE channels
@@ -65,5 +67,8 @@ go run cmd/admin/main.go --name "my-server"
 ```
 Generates an API key (printed once). The monitor is auto-created on first heartbeat.
 
+## Auto-Deploy Poller
+`cmd/webhook/main.go` is a standalone polling daemon that checks GitHub for new commits every N seconds (default 30). When the remote branch is ahead of the local HEAD, it runs `scripts/deploy.sh` (git pull + docker compose rebuild). Runs **outside** Docker Compose so it can restart the stack without killing itself.
+
 ## Env Vars
-DATABASE_URL, TELEGRAM_BOT_TOKEN, PORT (default 8080)
+DATABASE_URL, TELEGRAM_BOT_TOKEN, PORT (default 8080), DEPLOY_DIR, DEPLOY_BRANCH (default main), POLL_INTERVAL (default 30s)

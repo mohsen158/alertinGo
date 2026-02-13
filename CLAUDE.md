@@ -1,5 +1,8 @@
 # AlertinGo Project
 
+## Rules
+- After any code or structural change, update `README.md` if affected.
+
 ## Overview
 Health check monitoring & alerting system in Go. Servers send heartbeats; if they stop, Telegram alerts fire.
 

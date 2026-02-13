@@ -10,7 +10,7 @@ Health check monitoring and alerting system built with Go. Monitored servers sen
 4. A background goroutine checks every 10s: if an **active** monitor with a channel hasn't reported within its timeout, a Telegram alert is sent.
 5. If still down after `re_alert_interval`, a re-alert is sent.
 6. When heartbeats resume, a recovery notification is sent.
-7. Admin activates monitors and assigns notification channels via API.
+7. Admin generates API keys via `cmd/admin` CLI, then activates monitors and assigns notification channels via API.
 
 ## Quick Start
 
@@ -27,7 +27,6 @@ docker compose up --build
 | GET | `/api/v1/health` | Health check |
 | POST | `/api/v1/heartbeat` | Receive heartbeat (requires `X-API-Key` header) |
 | GET | `/api/v1/api-keys` | List API keys |
-| POST | `/api/v1/api-keys` | Create API key (returns plaintext once) |
 | DELETE | `/api/v1/api-keys/:id` | Delete API key |
 | GET | `/api/v1/monitors` | List all monitors |
 | GET | `/api/v1/monitors/:id` | Get one monitor |
@@ -40,15 +39,13 @@ docker compose up --build
 
 ## Usage Example
 
-**1. Create an API key:**
+**1. Generate an API key (admin CLI):**
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/api-keys \
-  -H 'Content-Type: application/json' \
-  -d '{"name": "web-server-1"}'
+go run cmd/admin/main.go --name "payment-service"
 ```
 
-Save the `key` from the response — it won't be shown again.
+Save the printed API key — it won't be shown again.
 
 **2. Send a heartbeat:**
 
@@ -98,7 +95,9 @@ postgres://alerting:alerting@localhost:5432/alerting
 
 ```
 alertinGo/
-├── cmd/main.go              # Entry point
+├── cmd/
+│   ├── main.go              # Entry point
+│   └── admin/main.go        # Admin CLI (generate API key)
 ├── handler/
 │   ├── heartbeat.go         # POST /heartbeat
 │   ├── monitor.go           # Monitor CRUD

@@ -31,7 +31,7 @@ migrations/002_api_keys.sql  → api_keys table
 - **Monitor**: unique by (monitor_name, check_type). Auto-created on first heartbeat as inactive.
 - **NotificationChannel**: has Telegram chat ID. Assigned to monitors by admin.
 - **AlertState**: tracks firing/resolved state, last_alerted_at for re-alerting.
-- **ApiKey**: SHA-256 hashed key for authenticating heartbeat requests. Key prefix stored for identification.
+- **ApiKey**: SHA-256 hashed key for authenticating heartbeat requests. Key prefix stored for identification. Admin-only: created directly in the database.
 - **NotificationLog**: every sent notification (alert, re_alert, recovered) is logged with success/error status.
 - Watcher checks every 10s: overdue active monitors with channels → alert/re-alert. Recovered monitors → resolve alert + notify.
 
@@ -42,7 +42,6 @@ migrations/002_api_keys.sql  → api_keys table
 - GET /health
 - POST /heartbeat (requires X-API-Key header)
 - GET /api-keys
-- POST /api-keys
 - DELETE /api-keys/:id
 - GET /monitors
 - GET /monitors/:id

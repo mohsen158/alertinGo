@@ -31,7 +31,6 @@ func main() {
 		api.POST("/heartbeat", middleware.RequireAPIKey(), handler.PostHeartbeat)
 
 		api.GET("/api-keys", handler.ListApiKeys)
-		api.POST("/api-keys", handler.CreateApiKey)
 		api.DELETE("/api-keys/:id", handler.DeleteApiKey)
 
 		api.GET("/monitors", handler.GetMonitors)

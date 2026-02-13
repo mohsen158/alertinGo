@@ -98,7 +98,7 @@ alertinGo/
 ├── cmd/
 │   ├── main.go              # Entry point
 │   ├── admin/main.go        # Admin CLI (generate API key)
-│   └── webhook/main.go      # Deploy poller (polls GitHub for new commits)
+│   └── deployer/main.go     # Deploy poller (polls GitHub for new commits)
 ├── handler/
 │   ├── heartbeat.go         # POST /heartbeat
 │   ├── monitor.go           # Monitor CRUD
@@ -138,7 +138,7 @@ The deploy poller runs **outside** Docker Compose (so it can restart the stack w
 
 ```bash
 # Build the deploy poller
-go build -o deploy-poller ./cmd/webhook/
+go build -o deploy-poller ./cmd/deployer/
 
 # Run it (or configure as a systemd service)
 DEPLOY_DIR=/path/to/alertinGo ./deploy-poller
